@@ -232,8 +232,26 @@ class ClassMapGenerator {
 
 if ( file_exists( __DIR__ . '/../vendor/autoload.php' ) ) {
 	require_once __DIR__ . '/../vendor/autoload.php';
-} elseif ( file_exists( dirname( dirname( dirname( __DIR__ ) ) ) . '/autoload.php' ) ) {
-	require_once dirname( dirname( dirname( __DIR__ ) ) ) . '/autoload.php';
+} else {
+	try {
+		\spl_autoload_register( function ( $class ) {
+			$base_dir = dirname( dirname( dirname( __DIR__ ) ) );
+			if ( file_exists( $base_dir . '/symfony/finder/Finder.php' ) ) {
+				if ( false === strpos( $class, 'Symfony\Component\Finder\\' ) ) {
+				} else {
+					$class = explode( 'Symfony\Component\Finder\\', $class );
+					if ( isset( $class[1] ) ) {
+						$class = $class[1] . '.php';
+						if ( file_exists( $base_dir . '/symfony/finder/' . $class ) ) {
+							require_once $base_dir . '/symfony/finder/' . $class;
+						}
+					}
+				}
+			}
+		} );
+	} catch ( Exception $exception ) {
+		echo 'Error : ' . $exception->getMessage();
+	}
 }
 
 $config_file = ( isset( $argv[1] ) ) ? $argv[1] : false;
