@@ -12,7 +12,7 @@
 	}
   ],
   "bin"         : [
-	"bin/generator.bat"
+	"bin/classmap-generator.bat"
   ],
   "require"     : {
 	"symfony/finder" : "*"
