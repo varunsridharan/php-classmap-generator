@@ -1,0 +1,13 @@
+{
+  "namespace" : "",
+  "source"    : [ "" ],
+  "output"    : {
+	"location" : "",
+	"type" : "php"
+  },
+  "excluded"  : {
+	"namespace" : [ ],
+	"paths"     : [ ]
+  },
+  "fullpath"  : true
+}

@@ -1,0 +1,20 @@
+{
+  "name"        : "varunsridharan/php-classmap-generator",
+  "description" : "Lightweight PHP Classmap Generator",
+  "type"        : "library",
+  "license"     : "GPL-3.0-or-later",
+  "authors"     : [
+	{
+	  "name"     : "Varun",
+	  "email"    : "varunsridharan23@gmail.com",
+	  "homepage" : "https://varunsridharan.in",
+	  "role"     : "Developer"
+	}
+  ],
+  "bin"         : [
+	"bin/generator.bat"
+  ],
+  "require"     : {
+	"symfony/finder" : "*"
+  }
+}
