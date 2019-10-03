@@ -254,45 +254,42 @@ if ( file_exists( __DIR__ . '/../vendor/autoload.php' ) ) {
 	}
 }
 
-$config_file = ( isset( $argv[1] ) ) ? $argv[1] : false;
-if ( ! empty( $config_file ) && file_exists( $config_file ) ) {
-	$cgf = file_get_contents( $config_file );
-	if ( ! empty( $cgf ) ) {
-		$cgf                          = json_decode( $cgf, true );
-		$cgf                          = array_merge( array(
-			'namespace' => '',
-			'source'    => '',
-			'output'    => array(),
-			'excluded'  => array(),
-			'fullpath'  => false,
-		), $cgf );
-		$cgf['excluded']              = array_merge( array(
-			'namespace' => '',
-			'paths'     => '',
-		), $cgf['excluded'] );
-		$cgf['output']                = array_merge( array(
-			'location' => '',
-			'type'     => '',
-		), $cgf['output'] );
-		$cgf['source']                = ( ! is_array( $cgf['source'] ) ) ? explode( ',', $cgf['source'] ) : $cgf['source'];
-		$cgf['excluded']['namespace'] = ( ! is_array( $cgf['excluded']['namespace'] ) ) ? explode( ',', $cgf['excluded']['namespace'] ) : $cgf['excluded']['namespace'];
-		$cgf['excluded']['paths']     = ( ! is_array( $cgf['excluded']['paths'] ) ) ? explode( ',', $cgf['excluded']['paths'] ) : $cgf['excluded']['paths'];
-		$maps                         = array();
 
-		foreach ( $cgf['source'] as $path ) {
-			$maps = array_merge( $maps, ClassMapGenerator::create_map( $path, array(
-				'excluded_paths'     => $cgf['excluded']['paths'],
-				'excluded_namespace' => $cgf['excluded']['namespace'],
-				'namespace'          => $cgf['namespace'],
-				'fullpath'           => $cgf['fullpath'],
-			) ) );
-		}
+/**
+ * 1. PHP Class Source
+ * 2. PHP Classmap File Output
+ * 3. Namespace (Leave Empty To Get All)
+ * 4. exclude_namespace
+ * 5. exclude_path
+ * 6. fullpath
+ */
 
+$last_updated             = date( 'D d-M-Y / h:i:s:a' );
+$cgf                      = array(
+	'namespace'         => ( isset( $argv[3] ) ) ? $argv[3] : '',
+	'source'            => ( isset( $argv[1] ) ) ? $argv[1] : '',
+	'output'            => ( isset( $argv[2] ) ) ? $argv[2] : '',
+	'exclude_namespace' => ( isset( $argv[4] ) ) ? $argv[4] : '',
+	'exclude_path'      => ( isset( $argv[5] ) ) ? $argv[5] : '',
+	'fullpath'          => ( isset( $argv[6] ) && ! empty( $argv[6] ) ) ? true : false,
+);
+$cgf['source']            = ( ! is_array( $cgf['source'] ) ) ? explode( ',', $cgf['source'] ) : $cgf['source'];
+$cgf['exclude_namespace'] = ( ! is_array( $cgf['exclude_namespace'] ) ) ? explode( ',', $cgf['exclude_namespace'] ) : $cgf['exclude_namespace'];
+$cgf['exclude_path']      = ( ! is_array( $cgf['exclude_path'] ) ) ? explode( ',', $cgf['exclude_path'] ) : $cgf['exclude_path'];
+$maps                     = array();
 
-		$last_updated = date( 'D d-M-Y / h:i:s:a' );
-		$total        = count( $maps );
-		$namespace    = $cgf['namespace'];
-		$contents     = <<<PHP
+foreach ( $cgf['source'] as $path ) {
+	$maps = array_merge( $maps, ClassMapGenerator::create_map( $path, array(
+		'excluded_paths'     => $cgf['exclude_path'],
+		'excluded_namespace' => $cgf['exclude_namespace'],
+		'namespace'          => $cgf['namespace'],
+		'fullpath'           => $cgf['fullpath'],
+	) ) );
+}
+
+$total     = count( $maps );
+$namespace = $cgf['namespace'];
+$contents  = <<<PHP
 <?php
 /**
  * Last Updated: $last_updated
@@ -303,12 +300,7 @@ if ( ! empty( $config_file ) && file_exists( $config_file ) ) {
 return %s;
 
 PHP;
-		$save_data    = ( 'json' === $cgf['output']['type'] ) ? json_encode( $maps ) : var_export( $maps, true );
-		$save_data    = ( 'json' === $cgf['output']['type'] ) ? $save_data : sprintf( $contents, $save_data );
-		file_put_contents( $cgf['output']['location'], $save_data );
-	} else {
-		echo 'Config File Read Error!';
-	}
-} else {
-	echo 'Classmap Config File Not Exists';
-}
+$path_info = pathinfo( $cgf['output'] );
+$save_data = ( 'json' === $path_info['extension'] ) ? json_encode( $maps ) : var_export( $maps, true );
+$save_data = ( 'json' === $path_info['extension'] ) ? $save_data : sprintf( $contents, $save_data );
+file_put_contents( $cgf['output'], $save_data );

@@ -1,10 +1,7 @@
 {
   "namespace" : "",
   "source"    : [ "" ],
-  "output"    : {
-	"location" : "",
-	"type" : "php"
-  },
+  "output"    : "",
   "excluded"  : {
 	"namespace" : [ ],
 	"paths"     : [ ]

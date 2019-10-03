@@ -38,22 +38,18 @@ Or **install it manually**:
 | excluded | Namespace / File Paths to exclude |
 | fullpath | set true to provide full path |
 
-### Sample Config File
-***class-mapper.json***
-```json
-{
-  "namespace" : "",
-  "source"    : [ "./folder1","./folder2" ],
-  "output"    : {
-	"location" : "mylocation/class-map-data.php",
-	"type" : "php"
-  },
-  "excluded"  : {
-	"namespace" : [ "Test/ABC/"],
-	"paths"     : [ "./folder1/unwanted","./folder1/unwanted2"]
-  },
-  "fullpath"  : false
-}
+### CMD Line
+```
+/**
+ * Arguments Order.
+ * 1. PHP Class Source
+ * 2. PHP Classmap File Output
+ * 3. Namespace (Leave Empty To Get All)
+ * 4. exclude_namespace
+ * 5. exclude_path
+ * 6. fullpath
+ */
+composer classmap-generator "your-path-to-php-class" "class-map-output/files.php"
 ```
 
 ## Sample Outputs
