@@ -99,8 +99,7 @@ class ClassMapGenerator {
 		$cwd = realpath( getcwd() );
 
 		foreach ( $path as $file ) {
-			$file_path      = $file->getPathname();
-			$file_path_base = $file_path;
+			$file_path = $file->getPathname();
 			if ( ! in_array( pathinfo( $file_path, PATHINFO_EXTENSION ), array( 'php', 'inc', 'hh' ), true ) ) {
 				continue;
 			}
@@ -138,7 +137,7 @@ class ClassMapGenerator {
 				}
 
 				if ( false === $failed && ! isset( $map[ $class ] ) ) {
-					$map[ $class ] = ( false === $args['fullpath'] ) ? $file_path_base : $file_path;
+					$map[ $class ] = ( false === $args['fullpath'] ) ? $file->getrelativePathname() : $file_path;
 				}
 			}
 		}
