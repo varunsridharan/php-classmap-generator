@@ -137,7 +137,7 @@ class ClassMapGenerator {
 				}
 
 				if ( false === $failed && ! isset( $map[ $class ] ) ) {
-					$map[ $class ] = ( false === $args['fullpath'] ) ? $file->getrelativePathname() : $file_path;
+					$map[ $class ] = ( false === $args['fullpath'] ) ? str_replace( '\\', '/', $file->getrelativePathname() ) : $file_path;
 				}
 			}
 		}
