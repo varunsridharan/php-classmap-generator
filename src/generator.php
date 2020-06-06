@@ -65,15 +65,16 @@ class ClassMapGenerator {
 	 * @throws \RuntimeException When the path is neither an existing file nor directory
 	 */
 	public static function create_map( $path, $args = array() ) {
-		$args      = array_merge( array(
+		$args               = array_merge( array(
 			'blacklist'          => null,
 			'namespace'          => null,
 			'excluded_paths'     => array(),
 			'excluded_namespace' => array(),
 			'fullpath'           => false,
 		), $args );
-		$blacklist = $args['blacklist'];
-		$namespace = $args['namespace'];
+		$blacklist          = $args['blacklist'];
+		$namespace          = $args['namespace'];
+		$excluded_namespace = $args['excluded_namespace'];
 
 		if ( is_string( $path ) ) {
 			if ( is_file( $path ) ) {
@@ -127,8 +128,8 @@ class ClassMapGenerator {
 					continue;
 				}
 
-				if ( ! empty( $args['excluded_namespace'] ) && is_array( $args['excluded_namespace'] ) ) {
-					foreach ( $args['excluded_namespace'] as $nspace ) {
+				if ( ! empty( $excluded_namespace ) && is_array( $excluded_namespace ) ) {
+					foreach ( $excluded_namespace as $nspace ) {
 						if ( ! empty( $nspace ) && 0 === strpos( $class, $nspace ) ) {
 							$failed = true;
 							break;
@@ -263,14 +264,14 @@ if ( file_exists( __DIR__ . '/../vendor/autoload.php' ) ) {
  * 6. fullpath
  */
 
-$last_updated             = date( 'D d-M-Y / h:i:s:a' );
+$last_updated             = date( 'D d-M-Y | h:i:s:a' );
 $cgf                      = array(
 	'namespace'         => ( isset( $argv[3] ) ) ? $argv[3] : '',
 	'source'            => ( isset( $argv[1] ) ) ? $argv[1] : '',
 	'output'            => ( isset( $argv[2] ) ) ? $argv[2] : '',
 	'exclude_namespace' => ( isset( $argv[4] ) ) ? $argv[4] : '',
 	'exclude_path'      => ( isset( $argv[5] ) ) ? $argv[5] : '',
-	'fullpath'          => ( isset( $argv[6] ) && ! empty( $argv[6] ) ) ? true : false,
+	'fullpath'          => ( isset( $argv[6] ) && ! empty( $argv[6] ) ),
 );
 $cgf['source']            = ( ! is_array( $cgf['source'] ) ) ? explode( ',', $cgf['source'] ) : $cgf['source'];
 $cgf['exclude_namespace'] = ( ! is_array( $cgf['exclude_namespace'] ) ) ? explode( ',', $cgf['exclude_namespace'] ) : $cgf['exclude_namespace'];
@@ -286,20 +287,24 @@ foreach ( $cgf['source'] as $path ) {
 	) ) );
 }
 
-$total     = count( $maps );
-$namespace = $cgf['namespace'];
+$headers = implode( PHP_EOL, array_filter( array(
+	'// Last Updated: ' . date( 'D d-M-Y | h:i:s:a' ),
+	'// Total Class: ' . count( $maps ),
+	( ! empty( $cgf['namespace'] ) ) ? '// Namespace: ' . $cgf['namespace'] : null,
+) ) );
+
 $contents  = <<<PHP
 <?php
-/**
- * Last Updated: $last_updated
- * Total Class:  $total
- * Namespace: $namespace
- */
+${headers}
 
 return %s;
 
 PHP;
 $path_info = pathinfo( $cgf['output'] );
-$save_data = ( 'json' === $path_info['extension'] ) ? json_encode( $maps ) : var_export( $maps, true );
+if ( 'json' === $path_info['extension'] ) {
+	$save_data = json_encode( $maps );
+} else {
+	$save_data = var_export( $maps, true );
+}
 $save_data = ( 'json' === $path_info['extension'] ) ? $save_data : sprintf( $contents, $save_data );
 file_put_contents( $cgf['output'], $save_data );
