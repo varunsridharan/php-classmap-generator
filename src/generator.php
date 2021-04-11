@@ -3,10 +3,9 @@
 use Symfony\Component\Finder\Finder;
 
 /**
- * ClassMapGenerator
+ * Class ClassMapGenerator
  *
- * @author Gyula Sallai <salla016@gmail.com>
- * @author Jordi Boggiano <j.boggiano@seld.be>
+ * @author Varun Sridharan <varunsridharan23@gmail.com>
  */
 class ClassMapGenerator {
 	/**
